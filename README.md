@@ -888,9 +888,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions or support:
 
-- **Project Repository**: [GitHub](https://github.com/YOUR_USERNAME/datavex-prospect-intelligence)
-- **Issue Tracker**: [GitHub Issues](https://github.com/YOUR_USERNAME/datavex-prospect-intelligence/issues)
-- **Email**: your.email@example.com
+- **Project Repository**: [GitHub](https://github.com/kajalkamble0713-jpg/datavex-prospect-intelligence)
+- **Issue Tracker**: [GitHub Issues](https://github.com/kajalkamble0713-jpg/datavex-prospect-intelligence/issues)
+- **Email**: kajalkamble0713@gmail.com
 
 ---
 
