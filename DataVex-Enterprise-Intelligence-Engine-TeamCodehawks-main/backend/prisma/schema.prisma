@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id                String   @id @default(uuid())
+  domain            String
+  status            String   @default("pending") // pending, processing, completed, failed
+  dossier           Json?
+  verdict           String?
+  decisionReasoning String?
+  outreachMessage   String?
+  bonusContent      Json?
+  trace             Json?
+  errorMessage      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([domain, createdAt])
+}
+
+model User {
+  id           String   @id @default(uuid())
+  employeeId   String?  @unique // For employees only
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("employee") // "admin" or "employee"
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+}

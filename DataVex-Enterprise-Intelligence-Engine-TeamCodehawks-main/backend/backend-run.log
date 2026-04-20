@@ -1,0 +1,25 @@
+DataVex backend listening on port 5000
+prisma:error 
+Invalid `prisma_1.prisma.user.findUnique()` invocation in
+C:\Users\pradh\Desktop\Hackathon project\backend\dist\controllers\auth.controller.js:57:45
+
+  54 const signin = async (req, res) => {
+  55     const parsed = signinSchema.parse(req.body);
+  56     const email = parsed.email.trim().toLowerCase();
+→ 57     const user = await prisma_1.prisma.user.findUnique(
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+[0mPOST /api/auth/signin [31m503[0m 4152.500 ms - 74[0m
+prisma:error 
+Invalid `prisma_1.prisma.user.findUnique()` invocation in
+C:\Users\pradh\Desktop\Hackathon project\backend\dist\controllers\auth.controller.js:57:45
+
+  54 const signin = async (req, res) => {
+  55     const parsed = signinSchema.parse(req.body);
+  56     const email = parsed.email.trim().toLowerCase();
+→ 57     const user = await prisma_1.prisma.user.findUnique(
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+[0mPOST /api/auth/signin [31m503[0m 4084.501 ms - 74[0m

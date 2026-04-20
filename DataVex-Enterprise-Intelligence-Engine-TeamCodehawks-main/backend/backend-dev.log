@@ -1,0 +1,54 @@
+
+> datavex-backend@1.0.0 dev
+> nodemon
+
+[33m[nodemon] 3.1.14[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): src\**\* prisma\schema.prisma[39m
+[33m[nodemon] watching extensions: ts,json[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[0mGET /health [32m200[0m 13.075 ms - 15[0m
+[0mGET /health [32m200[0m 5.442 ms - 15[0m
+[0mGET /favicon.ico [33m404[0m 2.142 ms - 29[0m
+prisma:error 
+Invalid `prisma.job.findFirst()` invocation in
+C:\Users\pradh\Desktop\Hackathon project\backend\src\controllers\job.controller.ts:58:38
+
+  55 }
+  56 
+  57 const cooldownBoundary = new Date(Date.now() - env.ANALYZE_COOLDOWN_MINUTES * 60 * 1000);
+→ 58 const recentJob = await prisma.job.findFirst(
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+[0mPOST /api/analyze [31m500[0m 4479.400 ms - 449[0m
+[0mGET /health [32m200[0m 9.765 ms - 15[0m
+[0mGET /health [36m304[0m 26.687 ms - -[0m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+DataVex backend listening on port 5000
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

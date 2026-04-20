@@ -1,0 +1,101 @@
+C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/controllers/auth.controller.ts(2,20): error TS2307: Cannot find module 'bcryptjs' or its corresponding type declarations.
+src/controllers/auth.controller.ts(4,17): error TS2307: Cannot find module 'jsonwebtoken' or its corresponding type declarations.
+src/controllers/auth.controller.ts(27,33): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(33,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(59,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(82,12): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/controllers/auth.controller.ts(85,36): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+    at createTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1942:10
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {
+  diagnosticCodes: [
+    2307, 2307,
+    2339, 2339,
+    2339, 2339,
+    2339
+  ]
+}
+C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/controllers/auth.controller.ts(2,20): error TS2307: Cannot find module 'bcryptjs' or its corresponding type declarations.
+src/controllers/auth.controller.ts(4,17): error TS2307: Cannot find module 'jsonwebtoken' or its corresponding type declarations.
+src/controllers/auth.controller.ts(27,33): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(33,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(59,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(82,12): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/controllers/auth.controller.ts(85,36): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+    at createTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1942:10
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {
+  diagnosticCodes: [
+    2307, 2307,
+    2339, 2339,
+    2339, 2339,
+    2339
+  ]
+}
+C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/controllers/auth.controller.ts(2,20): error TS7016: Could not find a declaration file for module 'bcryptjs'. 'C:/Users/pradh/Desktop/Hackathon project/backend/node_modules/bcryptjs/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/bcryptjs` if it exists or add a new declaration (.d.ts) file containing `declare module 'bcryptjs';`
+src/controllers/auth.controller.ts(30,33): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(36,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(62,29): error TS2339: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/auth.controller.ts(85,12): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/controllers/auth.controller.ts(88,36): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+    at createTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1942:10
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {
+  diagnosticCodes: [ 7016, 2339, 2339, 2339, 2339, 2339 ]
+}
+C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/controllers/auth.controller.ts(85,12): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/controllers/auth.controller.ts(88,36): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+    at createTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1942:10
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\pradh\Desktop\Hackathon project\backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {
+  diagnosticCodes: [ 2339, 2339 ]
+}

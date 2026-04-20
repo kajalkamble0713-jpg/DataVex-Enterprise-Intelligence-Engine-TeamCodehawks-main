@@ -1,0 +1,915 @@
+{
+  "name": "DataVex Prospect Intelligence Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "trigger-analysis",
+        "responseMode": "responseNode",
+        "httpMethod": "POST",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"accepted\":true,\"jobId\":\"{{$json.jobId}}\"}",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Webhook Ack",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        470,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "jobId",
+              "value": "={{$json.body.jobId}}"
+            },
+            {
+              "name": "domain",
+              "value": "={{$json.body.domain}}"
+            },
+            {
+              "name": "callbackUrl",
+              "value": "={{$json.body.callbackUrl || $env.N8N_CALLBACK_URL}}"
+            },
+            {
+              "name": "scraped_content",
+              "value": "={{$json.body.sourceData?.scrapedContent || \"\"}}"
+            },
+            {
+              "name": "news_data",
+              "value": "={{JSON.stringify($json.body.sourceData?.newsData || {})}}"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        470,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.scraped_content}}",
+              "operation": "notEmpty"
+            },
+            {
+              "value1": "={{$json.news_data}}",
+              "operation": "notEmpty"
+            }
+          ]
+        },
+        "combineOperation": "all"
+      },
+      "id": "4",
+      "name": "Has Cached Source Data?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        700,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chrome.browserless.io/content",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{$env.BROWSERLESS_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"url\":\"https://{{$json.domain}}\"}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "5",
+      "name": "Browserless Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        930,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json.domain + \" news\"}}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{$env.SERPAPI_API_KEY}}"
+            },
+            {
+              "name": "engine",
+              "value": "google"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "6",
+      "name": "SerpAPI News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        930,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "7",
+      "name": "Merge Scrape + News",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1160,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "scraped_content",
+              "value": "={{$json.data || $json.scraped_content || \"\"}}"
+            },
+            {
+              "name": "news_data",
+              "value": "={{JSON.stringify($json.organic_results || $json.news_data || {})}}"
+            }
+          ]
+        }
+      },
+      "id": "8",
+      "name": "Set Source Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1380,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.2,\"messages\":[{\"role\":\"system\",\"content\":\"You are a business researcher. Extract key company information from the website content and recent news. Return valid JSON with fields: name, description, industry, size, technologies, leadership, recentDevelopments.\"},{\"role\":\"user\",\"content\":\"Website: {{$json.scraped_content}}\\nNews: {{$json.news_data}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "9",
+      "name": "Researcher Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1610,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.2,\"messages\":[{\"role\":\"system\",\"content\":\"You are a market analyst. Assess market trends, competitive landscape, growth potential, and risks. Return valid JSON with fields: marketInsights, growthSignals, risks.\"},{\"role\":\"user\",\"content\":\"Company dossier: {{$json.choices[0].message.content}}\\nNews: {{$json.news_data}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "10",
+      "name": "Market Analyst Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.2,\"messages\":[{\"role\":\"system\",\"content\":\"You are a cloud/AI consultant. Evaluate tech stack and opportunities for modernization, AI adoption, and digital transformation. Return valid JSON with fields: techStackAnalysis, gaps, urgencyScore.\"},{\"role\":\"user\",\"content\":\"Website content: {{$json.scraped_content}}\\nTechnologies mentioned in dossier: {{$node[\\\"Researcher Agent\\\"].json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "11",
+      "name": "Tech Debt Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2070,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.2,\"messages\":[{\"role\":\"system\",\"content\":\"You are a financial analyst. Assess financial health signals, funding, hiring/layoffs, and budget pressure. Return valid JSON with fields: financialSignals, pressureScore.\"},{\"role\":\"user\",\"content\":\"News: {{$json.news_data}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "12",
+      "name": "Financial Pressure Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.1,\"messages\":[{\"role\":\"system\",\"content\":\"You are a skeptical sales director. Provide at least 5 concrete reasons NOT to pursue this account. Return valid JSON array where each item has objection and explanation.\"},{\"role\":\"user\",\"content\":\"Company dossier: {{$node[\\\"Researcher Agent\\\"].json.choices[0].message.content}}\\nMarket: {{$node[\\\"Market Analyst Agent\\\"].json.choices[0].message.content}}\\nTech: {{$node[\\\"Tech Debt Agent\\\"].json.choices[0].message.content}}\\nFinancial: {{$node[\\\"Financial Pressure Agent\\\"].json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "13",
+      "name": "Risk Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2530,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.1,\"messages\":[{\"role\":\"system\",\"content\":\"You are VP of Strategy at DataVex. Decide FINAL verdict as PURSUE or IGNORE using reject-first reasoning. Address each objection explicitly. Return valid JSON with fields: verdict and decisionReasoning.\"},{\"role\":\"user\",\"content\":\"Dossier: {{$node[\\\"Researcher Agent\\\"].json.choices[0].message.content}}\\nMarket: {{$node[\\\"Market Analyst Agent\\\"].json.choices[0].message.content}}\\nTech: {{$node[\\\"Tech Debt Agent\\\"].json.choices[0].message.content}}\\nFinancial: {{$node[\\\"Financial Pressure Agent\\\"].json.choices[0].message.content}}\\nObjections: {{$json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "14",
+      "name": "Decision Arbiter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2760,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.choices[0].message.content}}",
+              "operation": "contains",
+              "value2": "PURSUE"
+            }
+          ]
+        }
+      },
+      "id": "15",
+      "name": "Verdict PURSUE?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2990,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.3,\"messages\":[{\"role\":\"system\",\"content\":\"You are a senior sales consultant. Draft a personalized outreach email/LinkedIn message with subject line, greeting, body, and CTA.\"},{\"role\":\"user\",\"content\":\"Company dossier: {{$node[\\\"Researcher Agent\\\"].json.choices[0].message.content}}\\nDecision reasoning: {{$node[\\\"Decision Arbiter\\\"].json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "16",
+      "name": "Outreach Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3220,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.4,\"messages\":[{\"role\":\"system\",\"content\":\"You are a thought-leadership content creator. Return JSON with platform and content for a concise (<250 words) LinkedIn post.\"},{\"role\":\"user\",\"content\":\"Key insight: {{$node[\\\"Decision Arbiter\\\"].json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "17",
+      "name": "Bonus Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3450,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{\"Bearer \" + $env.CEREBRAS_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"llama3.1-8b\",\"temperature\":0.2,\"messages\":[{\"role\":\"system\",\"content\":\"You are a sales analyst. Write a concise rejection report with major objections and supporting signals.\"},{\"role\":\"user\",\"content\":\"Objections: {{$node[\\\"Risk Agent\\\"].json.choices[0].message.content}}\"}]}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "18",
+      "name": "Rejection Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3220,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "id": "19",
+      "name": "Merge Outcome",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const parseSafe = (txt) => { try { return JSON.parse(txt); } catch { return txt; } };\nconst arbiterRaw = $node[\"Decision Arbiter\"].json.choices?.[0]?.message?.content || \"{}\";\nconst arbiter = parseSafe(arbiterRaw);\nconst verdict = typeof arbiter === \"object\" && arbiter.verdict ? arbiter.verdict : (arbiterRaw.includes(\"PURSUE\") ? \"PURSUE\" : \"IGNORE\");\nconst decisionReasoning = typeof arbiter === \"object\" && arbiter.decisionReasoning ? arbiter.decisionReasoning : arbiterRaw;\nconst outreachRaw = $node[\"Outreach Agent\"].json?.choices?.[0]?.message?.content || \"\";\nconst rejectionRaw = $node[\"Rejection Report\"].json?.choices?.[0]?.message?.content || \"\";\nconst bonusRaw = $node[\"Bonus Agent\"].json?.choices?.[0]?.message?.content || \"\";\nconst dossierRaw = $node[\"Researcher Agent\"].json?.choices?.[0]?.message?.content || \"{}\";\nconst trace = [\n  { agent: \"Researcher\", input: `domain: ${$json.domain}`, output: dossierRaw },\n  { agent: \"Market Analyst\", input: dossierRaw, output: $node[\"Market Analyst Agent\"].json?.choices?.[0]?.message?.content || \"\" },\n  { agent: \"Tech Debt\", input: $json.scraped_content, output: $node[\"Tech Debt Agent\"].json?.choices?.[0]?.message?.content || \"\" },\n  { agent: \"Financial\", input: $json.news_data, output: $node[\"Financial Pressure Agent\"].json?.choices?.[0]?.message?.content || \"\" },\n  { agent: \"Risk\", input: \"reject-first\", output: $node[\"Risk Agent\"].json?.choices?.[0]?.message?.content || \"\" },\n  { agent: \"Arbiter\", input: \"all analyses\", output: arbiterRaw }\n];\nreturn [{\n  json: {\n    jobId: $json.jobId,\n    status: \"completed\",\n    dossier: parseSafe(dossierRaw),\n    verdict,\n    decisionReasoning,\n    outreachMessage: verdict === \"PURSUE\" ? outreachRaw : rejectionRaw,\n    bonusContent: verdict === \"PURSUE\" ? parseSafe(bonusRaw) : { platform: \"Internal\", content: \"No bonus content for ignored leads.\" },\n    trace,\n    sourceData: {\n      scrapedContent: $json.scraped_content,\n      newsData: parseSafe($json.news_data)\n    }\n  }\n}];"
+      },
+      "id": "20",
+      "name": "Build Callback Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3910,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$json.callbackUrl || $env.N8N_CALLBACK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{$env.N8N_WEBHOOK_SECRET}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "21",
+      "name": "Callback Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4140,
+        180
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "22",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "jobId",
+              "value": "={{$json.execution?.lastNodeExecutedData?.jobId || $json.workflowData?.jobId || \"\"}}"
+            },
+            {
+              "name": "status",
+              "value": "failed"
+            },
+            {
+              "name": "error",
+              "value": "={{$json.execution?.error?.message || \"Unknown workflow error\"}}"
+            }
+          ]
+        }
+      },
+      "id": "23",
+      "name": "Build Failure Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        470,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.N8N_CALLBACK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{$env.N8N_WEBHOOK_SECRET}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "id": "24",
+      "name": "Callback Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Webhook Ack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Has Cached Source Data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Cached Source Data?": {
+      "main": [
+        [
+          {
+            "node": "Set Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Browserless Scraper",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Browserless Scraper": {
+      "main": [
+        [
+          {
+            "node": "Merge Scrape + News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI News": {
+      "main": [
+        [
+          {
+            "node": "Merge Scrape + News",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Scrape + News": {
+      "main": [
+        [
+          {
+            "node": "Set Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Source Data": {
+      "main": [
+        [
+          {
+            "node": "Researcher Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Researcher Agent": {
+      "main": [
+        [
+          {
+            "node": "Market Analyst Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Analyst Agent": {
+      "main": [
+        [
+          {
+            "node": "Tech Debt Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tech Debt Agent": {
+      "main": [
+        [
+          {
+            "node": "Financial Pressure Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Financial Pressure Agent": {
+      "main": [
+        [
+          {
+            "node": "Risk Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk Agent": {
+      "main": [
+        [
+          {
+            "node": "Decision Arbiter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Arbiter": {
+      "main": [
+        [
+          {
+            "node": "Verdict PURSUE?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verdict PURSUE?": {
+      "main": [
+        [
+          {
+            "node": "Outreach Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejection Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outreach Agent": {
+      "main": [
+        [
+          {
+            "node": "Bonus Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bonus Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejection Report": {
+      "main": [
+        [
+          {
+            "node": "Merge Outcome",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Outcome": {
+      "main": [
+        [
+          {
+            "node": "Build Callback Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Callback Payload": {
+      "main": [
+        [
+          {
+            "node": "Callback Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Failure Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Failure Payload": {
+      "main": [
+        [
+          {
+            "node": "Callback Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "datavex-v1",
+  "meta": {
+    "instanceId": "datavex-hackathon"
+  },
+  "id": "datavex-prospect-intelligence"
+}

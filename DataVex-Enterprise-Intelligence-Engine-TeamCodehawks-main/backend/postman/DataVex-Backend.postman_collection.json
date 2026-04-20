@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "DataVex Backend API",
+    "_postman_id": "f2270311-23c2-4f8a-9efe-b1f5148ab0de",
+    "description": "Endpoints for DataVex Prospect Intelligence Engine",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Analyze Domain",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"domain\": \"acme.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/analyze",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "analyze"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Job Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/status/{{jobId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "status",
+            "{{jobId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Job Results",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/results/{{jobId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "results",
+            "{{jobId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "History",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/history?limit=10&offset=0&search=&verdict=PURSUE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            },
+            {
+              "key": "search",
+              "value": ""
+            },
+            {
+              "key": "verdict",
+              "value": "PURSUE"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "n8n Callback",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-webhook-secret",
+            "value": "{{webhookSecret}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jobId\": \"{{jobId}}\",\n  \"dossier\": {\n    \"name\": \"Acme\",\n    \"industry\": \"SaaS\"\n  },\n  \"verdict\": \"PURSUE\",\n  \"decisionReasoning\": \"Strong fit for AI modernization.\",\n  \"outreachMessage\": \"Subject: Helping Acme accelerate AI initiatives...\",\n  \"bonusContent\": {\n    \"platform\": \"LinkedIn\",\n    \"content\": \"Great AI transformations start with data discipline...\"\n  },\n  \"trace\": [\n    {\n      \"agent\": \"Researcher\",\n      \"input\": \"domain: acme.com\",\n      \"output\": \"...\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/webhook/n8n-callback",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "webhook",
+            "n8n-callback"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "jobId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "webhookSecret",
+      "value": "replace_with_a_long_random_secret"
+    }
+  ]
+}
